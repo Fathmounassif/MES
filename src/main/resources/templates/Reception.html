@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template1"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-Security" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reception</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+
+</head>
+<body>
+<div layout:fragment="content1">
+<div class="container" mt-3>
+    <div class="card-header">Liste des Reception</div>
+    <div class="card-body">
+        <form  method="get" th:action="@{/magasinier/reception}">
+            <label>Chercher un numéro de Bl:</label>
+            <input type="text" name="keyword" th:value="${keyword}">
+            <button type="submit" class="btn btn-danger">Chercher</button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Num_BL</th>
+                <th>Date_de_reception</th>
+                <th>ID_Fournisseur</th>
+                <th>Nom_fornisseur</th>
+                <th>ID_Produit</th>
+                <th>Famile_Produit</th>
+                <th>N_de_lot</th>
+                <th>Qte_en_KG</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p:${listReceptions}"  th:if="${p.valide==false}" >
+                <td th:text="${p.id_reception}"></td>
+                <td th:text="${p.nom}"></td>
+                <td th:text="${p.Date_de_reception}"></td>
+                <td th:text="${p.fornisseur.id_fornisseur}"></td>
+                <td th:text="${p.fornisseur.nom_fornisseur}"></td>
+                <td th:text="${p.produits.id_bobine}"></td>
+                <td th:text="${p.produits.Famile_produit}"></td>
+                <td th:text="${p.N_de_lot}"></td>
+                <td th:text="${p.Qte_en_KG}"></td>
+                <td><a class="btn btn-success" th:href="@{/magasinier/update/{id_reception}(id_reception=${p.id_reception},keyword=${keyword},page=${currentPage})}">Valider</a></td>
+            </tr>
+            </tbody>
+
+        </table>
+        <ul class="nav nav-pills">
+            <li th:each="page,status:${pages}">
+                <a  th:class="${status.index==currentPage? 'btn btn-danger ms-1':'btn btn-outline-danger ms-1'}"
+                        th:text="${status.index+1}"
+                th:href="@{/magasinier/reception(page=${status.index},keyword=${keyword})}"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

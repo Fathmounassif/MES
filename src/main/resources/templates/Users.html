@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template1"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-Security" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Roles</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+
+</head>
+<body>
+<div layout:fragment="content1">
+<div class="container" mt-3>
+    <div class="card-header">Roles:</div>
+    <div class="card-body">
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id User</th>
+                <th>Nom Utilisateur</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p:${listUsers}" >
+                <td th:text="${p.userId}"></td>
+                <td th:text="${p.username}"></td>
+                <td><a class="btn btn-danger" th:href="@{/admin/deleteUser(userId=${p.userId})}">Delete</a></td>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

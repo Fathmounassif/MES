@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template1"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-Security" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reception</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+
+</head>
+<body>
+<div layout:fragment="content1">
+<div class="container" mt-3>
+    <div class="card-header">Liste des Reception</div>
+    <div class="card-body">
+        <form  method="get" th:action="@{/recepensable_qualite/validation}">
+            <label>Chercher un controlleur :</label>
+            <input type="text" name="keyword" th:value="${keyword}">
+            <button type="submit" class="btn btn-danger">Chercher</button>
+        </form>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id operation</th>
+                <th>Controlleur de qualité</th>
+                <th>Id bobine </th>
+                <th>Echantiallon</th>
+                <th>Famile Bobine</th>
+                <th>Nuance</th>
+                <th>Declarer</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p:${listReceptionsResponsable}"  th:if="${p.valide==false}" >
+                <td th:text="${p.id_operation}"></td>
+                <td th:text="${p.nom}"></td>
+                <td th:text="${p.produits.id_bobine}"></td>
+                <td th:text="${p.echantillan}"></td>
+                <td th:text="${p.produits.Famile_produit}"></td>
+                <td th:text="${p.produits.Nuance}"></td>
+                <td th:text="${p.declarer}"></td>
+                <td sec:authorize="hasAuthority('RECEPENSABL_QAUALITE')"><a class="btn btn-success" th:href="@{/recepensable_qualite/update/{id_operation}(id_operation=${p.id_operation},keyword=${keyword},page=${currentPage})}" >Conforme</a></td>
+                <td sec:authorize="hasAuthority('RECEPENSABL_QAUALITE')">
+                    <a class="btn btn-danger" th:href="@{/recepensable_qualite/deleteValide}" >Non Conforme</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <ul class="nav nav-pills">
+            <li th:each="page,status:${pages}">
+                <a  th:class="${status.index==currentPage? 'btn btn-danger ms-1':'btn btn-outline-danger ms-1'}"
+                        th:text="${status.index+1}"
+                th:href="@{/recepensable_qualite/validation(page=${status.index},keyword=${keyword})}"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

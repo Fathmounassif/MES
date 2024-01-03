@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template1"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-Security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Validation</title>
+    <meta http-equiv="refresh" content="100">
+    <script th:src="@{/js/actions.js}" type="text/javascript"></script>
+    <script th:src="@{/js/qrcode.min.js}"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+    </script>
+    <!--Envoie d'email-->
+    <script type="text/javascript">
+   (function(){
+      emailjs.init("jyOB7NLwKZrWZQqy0");
+   })();
+</script>
+</head>
+<body>
+<div layout:fragment="content1">
+    <div class="container p-3 mb-2 bg-danger text-dark">
+        <label><b><b>Cliquer le boutton pour voir le QR Code</b></b></label>
+        <br>
+        <div    th:switch="${reception.nom}" >
+            <div  th:each="p:${valide}" th:case="${p.nom}">
+            <div th:switch="${reception.produits.Famile_produit}">
+                <input type="button" th:case="LAC" class="qr_text container"
+              th:value="|${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}X${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+                       onclick="generate();style.display='none';document.getElementById('imprimer').disabled = false">
+        <input type="button" th:case="GBL"  class="qr_text container"
+         th:value="|${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}Z${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+               onclick="generate();style.display='none';document.getElementById('imprimer').disabled = false">
+                <input type="button" th:case="LAF"  class="qr_text container"
+                       th:value="|${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}Y${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+                       onclick="generate();style.display='none';document.getElementById('imprimer').disabled = false">
+        <input type="button" th:case="*" th:value="Ce produit n'existe pas"  onclick="generate();style.display='none';document.getElementById('imprimer').disabled = false" >
+            </div>
+        <br>
+            <form th:action="@{/magasinier/save(page=${page},keyword=${keyword})}" method="post">
+            <input  type="hidden" name="nom" th:value="${reception.nom}">
+            <input  type="hidden" name="id_reception" th:value="${reception.id_reception}">
+            <input  type="checkbox" onchange="document.getElementById('sub').disabled = !this.checked;document.getElementById('imprimer').disabled = true" disabled="disabled" id="check" />
+            <input  class="btn btn-success" onclick="alert('votre formulaire est valider')" type="submit" name="sub" value=" Valider" id="sub" disabled="disabled" />
+            <input type="button" onclick="printContent('QRCode');document.getElementById('check').disabled = false" value="Imprimer" disabled="disabled" id="imprimer" class="btn btn-dark" >
+        </form>
+            </div>
+            <div th:case="*">
+                <div th:switch="${reception.produits.Famile_produit}">
+                    <input type="button" th:case="LAC" class="qr_text container"
+                           th:value="|${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}X${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+                           onclick="generate();style.display='none';document.getElementById('imprimerr').disabled = false">
+                    <input type="button" th:case="GBL"  class="qr_text container"
+                           th:value="|${reception.produits.id_bobine}${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}Z${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+                           onclick="generate();style.display='none';document.getElementById('imprimerr').disabled = false">
+                    <input type="button" th:case="LAF"  class="qr_text container"
+                           th:value="|${reception.produits.id_bobine}${reception.fornisseur.id_fornisseur}Y${reception.produits.Nuance}${reception.produits.Largeur}${reception.produits.Epesseur}${reception.Date_de_reception}|"
+                           onclick="generate();style.display='none';document.getElementById('imprimerr').disabled = false">
+                    <input type="button" th:case="*" th:value="Ce produit n'existe pas"  onclick="generate();style.display='none';document.getElementById('imprimerr').disabled = false" >
+                </div>
+                <br>
+                <form th:action="@{/magasinier/save(page=${page},keyword=${keyword})}" method="post">
+                    <input  type="hidden" name="nom" th:value="${reception.nom}">
+                    <input  type="hidden" name="id_reception" th:value="${reception.id_reception}">
+                <input  type="checkbox" onchange="sendEmail();document.getElementById('subb').disabled = !this.checked;document.getElementById('imprimerr').disabled = true" disabled="disabled" id="checkk" />
+                <input  class="btn btn-success" onclick="alert('votre formulaire est valider')" type="submit" name="subb" value=" Valider" id="subb" disabled="disabled" />
+                <input type="button" onclick="printContent('QRCode');document.getElementById('checkk').disabled = false" value="Imprimer" disabled="disabled" id="imprimerr" class="btn btn-dark" >
+                </form>
+        </div>
+        </div>
+    </div>
+            <div class="qr_code position-absolute top-50 start-50 translate-middle" id="QRCode">
+
+                    <div class="form-control">
+                        <label > ID: </label>
+                        <label th:text="${reception.id_reception}" ></label>
+                    </div>
+                    <div class="form-control">
+                        <label > Num de Bl: </label>
+                        <label th:text="${reception.Nom}" ></label>
+
+                    </div>
+                    <div class="form-control">
+                        <label > Date de reception: </label>
+                        <label th:text="${reception.Date_de_reception}" ></label>
+                    </div>
+                    <div class="form-control">
+                        <label > Code forniseur: </label>
+                        <label th:text="${reception.fornisseur.id_fornisseur}" ></label>
+
+                    </div>
+                    <div class="form-control">
+                        <label > Code Produit: </label>
+                        <label th:text="${reception.produits.id_bobine}" ></label>
+                    </div>
+                    <div class="form-control">
+                        <label > Num de lot: </label>
+                        <label th:text="${reception.N_de_lot}" ></label>
+                    </div>
+                    <div class="form-control">
+                        <label > Quantité(KG) : </label>
+                        <label th:text="${reception.Qte_en_KG}" ></label>
+                    </div>
+            </div>
+
+
+
+
+
+
+    <!--generer QRcode-->
+    <script type="text/javascript">
+    var qr_text =document.querySelector(".qr_text");
+    function generate(){
+    var qrcode=document.querySelector(".qr_code");
+    qrcode.style.display="flex";
+    new QRCode(qrcode,qr_text.value);
+    }
+    </script>
+    <!--imprission-->
+    <script>
+        function printContent(e1){
+        var restorepage=document.body.innerHTML;
+        var printcontent=document.getElementById(e1).innerHTML;
+        document.body.innerHTML=printcontent;
+        window.print();
+        document.body.innerHTML=restorepage;
+        }
+    </script>
+
+</div>
+</body>
+</html>

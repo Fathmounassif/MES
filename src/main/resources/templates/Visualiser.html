@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template1"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-Security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Validation</title>
+    <meta http-equiv="refresh" content="100">
+    <script th:src="@{/js/responsable.js}" type="text/javascript"></script>
+    <script th:src="@{/js/qrcode.min.js}"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script th:src="@{/js/qrcode.min.js}"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+    </script>
+    <!--Envoie d'email-->
+    <script type="text/javascript">
+   (function(){
+      emailjs.init("sdiUjVH_duBA9Qi_o");
+   })();
+</script>
+</head>
+<body>
+<div layout:fragment="content1"><br><br><br>
+    <div class="container p-3 mb-2 bg-danger text-dark">
+        <form th:action="@{/recepensable_qualite/validation}" method="get">
+            <input  type="checkbox" onchange="sendEmaill();generate();document.getElementById('imprimer').disabled = !this.checked;" id="check" />
+            <input type="button" onclick="printContent('QRCode');document.getElementById('check').disabled = true;document.getElementById('sub').disabled = false;document.getElementById('imprimer').disabled = true"  value="Imprimer" disabled="disabled" id="imprimer" class="btn btn-dark" >
+            <input  class="btn btn-success"  type="submit" name="sub" value=" Valider" id="sub" disabled="disabled" />
+        </form>
+
+        <br><br><br>
+        <div class="qr_code" id="QRCode">
+            <div th:switch="${responsable.produits.Famile_produit}">
+                <input type="hidden" th:case="LAC" class="qr_text container"
+                       th:value="|${responsable.produits.id_bobine}X${responsable.produits.Nuance}${responsable.produits.Largeur}${responsable.produits.Epesseur}${responsable.declarer}|"
+                       onclick="generate();style.display='none'">
+                <input type="hidden" th:case="GBL"  class="qr_text container"
+                       th:value="|${responsable.produits.id_bobine}Z${responsable.produits.Nuance}${responsable.produits.Largeur}${responsable.produits.Epesseur}${responsable.declarer}|"
+                       onclick="generate();style.display='none'">
+                <input type="hidden" th:case="LAF"  class="qr_text container"
+                       th:value="|${responsable.produits.id_bobine}Y${responsable.produits.Nuance}${responsable.produits.Largeur}${responsable.produits.Epesseur}${responsable.declarer}|"
+                       onclick="generate();style.display='none'">
+                <input type="hidden" th:case="*" th:value="Ce produit n'existe pas"  onclick="generate();style.display='none'" >
+            </div>
+        <div class="form-control">
+            <label > ID: </label>
+            <label th:text="${responsable.id_operation}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Nom Controlleur: </label>
+            <label th:text="${responsable.Nom}" ></label>
+
+        </div>
+        <div class="form-control">
+            <label > Id Produit: </label>
+            <label th:text="${responsable.produits.id_bobine}" ></label>
+
+        </div>
+        <div class="form-control">
+            <label > Largeur: </label>
+            <label th:text="${responsable.produits.Largeur}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Epesseur: </label>
+            <label th:text="${responsable.produits.epesseur}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Nuance: </label>
+            <label th:text="${responsable.produits.Nuance}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Famile Produit  : </label>
+            <label th:text="${responsable.produits.Famile_produit}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Echantillon : </label>
+            <label th:text="${responsable.echantillan}" ></label>
+        </div>
+        <div class="form-control">
+            <label > Declarer: </label>
+            <label th:text="${responsable.declarer}" ></label>
+        </div>
+    </div>
+    </div>
+<!--generer QRcode-->
+<script type="text/javascript">
+    var qr_text =document.querySelector(".qr_text");
+    function generate(){
+    var qrcode=document.querySelector(".qr_code");
+    qrcode.style.display="flex";
+    new QRCode(qrcode,qr_text.value);
+    }
+    </script>
+<!--imprission-->
+<script>
+        function printContent(e1){
+        var restorepage=document.body.innerHTML;
+        var printcontent=document.getElementById(e1).innerHTML;
+        document.body.innerHTML=printcontent;
+        window.print();
+        document.body.innerHTML=restorepage;
+        }
+    </script>
+
+</div>
+</body>
+</html>
